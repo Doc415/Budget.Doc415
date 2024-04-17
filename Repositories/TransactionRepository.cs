@@ -13,7 +13,7 @@ public class TransactionRepository : ITransactionRepository
         _fcontext = fcontext;
     }
 
-    public async Task<List<Transaction>> GetAllTransactions(string name, DateTime transactionDate, int categoryId)
+    public async Task<List<Transaction>> GetAllTransactions(string SearchName,DateTime StartDate, DateTime EndDate, int? categoryId)
     {
         using var _context = _fcontext.CreateDbContext();
         IQueryable<string> transactionQuery = from m in _context.Transactions
@@ -24,9 +24,9 @@ public class TransactionRepository : ITransactionRepository
         try
         {
 
-            if (!string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(SearchName))
             {
-                transactions = transactions.Where(s => s.Name == name);
+                transactions = transactions.Where(s => s.Name == SearchName);
             }
 
             if (categoryId != null)
@@ -34,9 +34,14 @@ public class TransactionRepository : ITransactionRepository
                 transactions = transactions.Where(x => x.RefCatId == categoryId);
             }
 
-            if (transactionDate != null)
+            if (StartDate != null)
             {
-                transactions = transactions.Where(x => x.Date == transactionDate);
+                transactions = transactions.Where(x => x.Date > StartDate);
+            }
+
+            if (EndDate != null)
+            {
+                transactions = transactions.Where(x => x.Date < EndDate);
             }
 
             return await transactions.ToListAsync();

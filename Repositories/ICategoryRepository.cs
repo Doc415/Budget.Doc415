@@ -8,6 +8,7 @@ public interface ICategoryRepository
     Task<List<Category>> GetAllCategories();
     Task DeleteCategory(int id);
     Task InsertCategory(Category category);
-    Task UpdateCategory(int id, Category category);
+    Task UpdateCategory(Category category);
     Task<SelectList> GetCategories();
+    Task <int> GetCategoryByName(string name);
 }

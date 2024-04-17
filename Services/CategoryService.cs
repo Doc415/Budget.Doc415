@@ -18,6 +18,11 @@ public class CategoryService
         return await _categoryRepository.GetAllCategories();
     }
 
+    public async Task<int> GetCategoryByName(string name)
+    {
+        return await _categoryRepository.GetCategoryByName(name);
+    }
+
     public async Task<SelectList> GetCategoriesForPullDown()
     {
         return await _categoryRepository.GetCategories();
@@ -33,9 +38,9 @@ public class CategoryService
         await _categoryRepository.InsertCategory(category);
     }
 
-    public async Task UpdateCategory(int id, Category category)
+    public async Task UpdateCategory(Category category)
     {
-        await _categoryRepository.UpdateCategory(id, category);
+        await _categoryRepository.UpdateCategory(category);
     }
 }
 

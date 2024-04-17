@@ -3,12 +3,148 @@
     ViewData["Title"] = "Transactions";
 }
 
-<head>
-    <!-- other head elements -->
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
+<nav class="navbar navbar-expand-lg navbar-light bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-<body>
-    <div>hello world</div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active me-2">
+                @*ADD CATEGORY MODAL TOGGLE BUTTON*@
+                <button type="button" class="btn btn-info categorybutton" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add New Category</button>
 
-</body>
+            </li>
+            <li class="nav-item me-2">
+                @*EDIT CATEGORY MODAL TOGGLE BUTTON*@
+                <button type="button" class="btn btn-info categorybutton" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit Categories</button>
+
+            </li>
+
+            <li class="nav-item me-2">
+                <form asp-action="Index" asp-controller="Transaction" method="Get" class="form-inline my-2 my-lg-0 mr-2">
+                    <div class="d-flex justify-content-around">
+                        <div class="form-group me-2">
+                            <input asp-for="SearchName" class="form-control mr-sm-2 transanctionfilter" placeholder="Transaction name" type="search" id="searchbox" aria-label="Search">
+                        </div>
+                        <div class="form-group me-2">
+                            Category: <select asp-for="FilterCategory" asp-items="Model.CategoriesSelect">
+                                <option value="">All</option>
+                            </select>
+
+                        </div>
+                        <div class="form-group me-2">
+                            <input asp-for="StartDate" class="form-control transactionfilter" type="date" placeholder="Start" aria-label="Start date" />
+                        </div>
+                        <div class="form-group me-2">
+                            <input asp-for="EndDate" class="form-control transactionfilter" type="date" placeholder="End" aria-label="End date" />
+                        </div>
+                        <div class="form-group me-2">
+                            <button class="btn btn-outline-dark transactionfilter my-2 my-sm-0" type="submit">Filter transactions</button>
+                        </div>
+                    </div>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+
+    @*EDIT CATEGORY MODAL*@
+
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">Edit categories</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @foreach (var category in Model.Categories)
+                    {
+                        <form asp-action="Edit" asp-controller="Category" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="@category.Id" value="@category.Id" />
+                            <div class="form-group">
+                                <label asp-for="@category.Name" class="control-label"></label>
+                                <input asp-for="@category.Name" class="form-control" />
+                                <span asp-validation-for="@category.Name" class="text-danger"></span>
+                                <p></p>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Save changes" data-bs-dismiss="modal" class="btn btn-primary" />
+                                <button type="button" class="btn btn-secondary" onclick=deleteCategory(@category.Id) data-dismiss="modal">Delete</button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    @*ADD CATEGORY MODAL*@
+
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Add new category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="Create" asp-controller="Category" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="NewCategory.Id" />
+                        <div class="form-group">
+                            <label asp-for="NewCategory.Name" class="control-label"></label>
+                            <input asp-for="NewCategory.Name" class="form-control" />
+                            <span asp-validation-for="NewCategory.Name" class="text-danger"></span>
+                            <p></p>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Add" data-bs-dismiss="modal" class="btn btn-primary" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="d-flex justify-content-center">
+        <div class="card mt-5">
+            <div class="card-body">
+                <h5 class="card-title text-center">Transaction List</h5>
+                @foreach (var transaction in Model.Transactions)
+                {
+                    <div class="input-group mb-3 flex-nowrap justify-content-left">
+                        <form asp-action="Update" asp-controller="Transaction">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <input type="hidden" asp-for="@transaction.Id" />
+                                <label asp-for="@transaction.Name" class="control-label"></label>
+                                <input asp-for="@transaction.Name" class="form-control" />
+                                <span asp-validation-for="@transaction.Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Save" class="btn btn-primary" />
+                            </div>
+                        </form>
+                    </div>
+                }
+                </h4>
+            </div>
+        </div>
+    </div>
+
+
+
+

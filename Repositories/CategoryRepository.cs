@@ -8,16 +8,17 @@ namespace Budget.Doc415.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {
-        private readonly BudgetDb _context;
-        public CategoryRepository(BudgetDb context)
-        {
-            _context = context;
-        }
+        private readonly IDbContextFactory<BudgetDb> _fcontext;
 
+        public CategoryRepository(IDbContextFactory<BudgetDb> fcontext)
+        {
+            _fcontext = fcontext;
+        }
         public async Task<List<Category>> GetAllCategories()
         {
             try
             {
+                using var _context = _fcontext.CreateDbContext();
                 var categories = await _context.Categories.ToListAsync();
                 return categories;
             }
@@ -30,15 +31,29 @@ namespace Budget.Doc415.Repositories
 
         public async Task<SelectList> GetCategories()
         {
+            using var _context = _fcontext.CreateDbContext();
             var categoryList = new SelectList(await _context.Categories.Select(x => x.Name).Distinct().ToListAsync());
             return categoryList;
+        }
+
+        public async Task<int> GetCategoryByName(string name)
+        {
+                using var _context = _fcontext.CreateDbContext();
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Name == name);
+                if(category !=null)
+                   return category.Id;
+                else
+                   return -1;
+            
+
         }
 
         public async Task DeleteCategory(int id)
         {
             try
             {
-                var category = _context.Categories.FirstOrDefault(x => x.Id == id);
+                using var _context = _fcontext.CreateDbContext();
+                var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
                 _context.Categories.Remove(category);
                 await _context.SaveChangesAsync();
             }
@@ -52,10 +67,7 @@ namespace Budget.Doc415.Repositories
         {
             try
             {
-                var newCategory = new Category()
-                {
-                    Name = category.Name,
-                };
+                using var _context = _fcontext.CreateDbContext();
                 await _context.AddAsync(category);
                 await _context.SaveChangesAsync();
             }
@@ -65,11 +77,12 @@ namespace Budget.Doc415.Repositories
             }
         }
 
-        public async Task UpdateCategory(int id, Category category)
+        public async Task UpdateCategory(Category category)
         {
             try
             {
-                var toUpdate = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+                using var _context = _fcontext.CreateDbContext();
+                var toUpdate = await _context.Categories.FirstOrDefaultAsync(x => x.Id == category.Id);
                 toUpdate.Name = category.Name;
                 _context.Update(toUpdate);
                 await _context.SaveChangesAsync();

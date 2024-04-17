@@ -19,17 +19,32 @@ public class TransactionController : Controller
         _categoryService = categoryService;
     }
 
-   
+
     [HttpGet]
-    public async Task<ActionResult<List<Transaction>>> Index(string name, string transactionDate, int categoryId)
+    public async Task<ActionResult<List<Transaction>>> Index(string SearchName, string StartDate, string EndDate, string FilterCategory)
     {
-        var transactionList = await _transactionService.GetAllTransactions(name, transactionDate, categoryId);
-        var categoryList= await _categoryService.GetAllCategories();
-        var modelToView=new IndexViewModel() { Categories=categoryList, Transactions=transactionList};
+        int? _filterCategoryID = null;
+        if (string.IsNullOrEmpty(FilterCategory))
+        {
+            _filterCategoryID = null;
+        } else
+            _filterCategoryID=await _categoryService.GetCategoryByName(FilterCategory);
+        
+        var transactionList = await _transactionService.GetAllTransactions(SearchName, StartDate,EndDate, _filterCategoryID);
+        var categoryList = await _categoryService.GetAllCategories();
+        var categoriesSelectList = await _categoryService.GetCategoriesForPullDown();
+        var modelToView = new IndexViewModel()
+        {
+            Categories = categoryList,
+            Transactions = transactionList,
+            NewCategory = new Category() { Name = string.Empty },
+            NewTransaction = new Transaction(),
+            CategoriesSelect= categoriesSelectList
+        };
         return View(modelToView);
     }
 
-    
+
     [HttpPost]
     public async Task<ActionResult> Add(Transaction transaction)
     {
@@ -37,7 +52,7 @@ public class TransactionController : Controller
         return Ok();
     }
 
-    
+
     [HttpPut]
     public async Task<IActionResult> Put(int id, Transaction transaction)
     {
@@ -49,7 +64,7 @@ public class TransactionController : Controller
         return Ok();
     }
 
-    
+
     [HttpDelete]
     public async Task Delete(int id)
     {

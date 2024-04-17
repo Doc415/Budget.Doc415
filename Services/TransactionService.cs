@@ -14,10 +14,11 @@ public class TransactionService
     }
 
 
-    public async Task<List<Transaction>> GetAllTransactions(string name, string transactionDate, int categoryId)
+    public async Task<List<Transaction>> GetAllTransactions(string SearchName, string StartDate, string EndDate, int? FilterCategory)
     {
-        var _transactionDate = Transformer.ConvertToDateTime(transactionDate);
-        return await _transactionRepository.GetAllTransactions(name, _transactionDate, categoryId);
+        var _startDate = Transformer.ConvertToDateTime(StartDate);
+        var _endDate = Transformer.ConvertToDateTime(EndDate);
+        return await _transactionRepository.GetAllTransactions(SearchName, _startDate,_endDate, FilterCategory);
     }
 
     public async Task InsertTransaction(Transaction transaction)

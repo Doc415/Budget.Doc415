@@ -22,12 +22,12 @@ public class Program
         builder.Services.AddScoped<CategoryService>();
         builder.Services.AddMvcCore().AddRazorViewEngine();
         builder.Services.AddControllers();
-       
+
 
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
-      
+
 
         app.UseHttpsRedirection();
 
@@ -35,14 +35,12 @@ public class Program
         app.UseStaticFiles();
 
         app.UseRouting();
-       
+
 
         app.MapControllerRoute(
                       name: "default",
                       pattern: "{controller=Transaction}/{action=Index}/{id?}");
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Category}/{action=Index}/{id?}");
+
         app.Run();
     }
 }

@@ -8,6 +8,6 @@ public class Category
 
     [DataType(DataType.Text)]
     [Required(ErrorMessage = "Please enter a category name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
 }
